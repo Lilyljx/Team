@@ -1,0 +1,11 @@
+﻿  ArmorDetect.cpp
+c:\learnopencv\armordector\armordector\armordetect.h(35): warning C4305: “=”: 从“double”到“float”截断
+c:\learnopencv\armordector\armordector\armordetect.h(38): warning C4305: “=”: 从“double”到“float”截断
+c:\learnopencv\armordector\armordector\armordetect.cpp(107): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+c:\learnopencv\armordector\armordector\armordetect.cpp(121): warning C4305: “*=”: 从“double”到“float”截断
+c:\learnopencv\armordector\armordector\armordetect.cpp(122): warning C4305: “*=”: 从“double”到“float”截断
+c:\learnopencv\armordector\armordector\armordetect.cpp(154): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+c:\learnopencv\armordector\armordector\armordetect.cpp(155): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+c:\learnopencv\armordector\armordector\armordetect.cpp(156): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+  ArmorDector.vcxproj -> C:\learnopencv\ArmorDector\x64\Debug\ArmorDector.exe
+  ArmorDector.vcxproj -> C:\learnopencv\ArmorDector\x64\Debug\ArmorDector.pdb (Full PDB)
