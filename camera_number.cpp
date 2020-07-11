@@ -1,45 +1,49 @@
-/* 数字识别 - by:tx
-* 原理：
-*   这是一个简单的识别数字的例子，局限性是只能识别规范字体
+/* 数字识别
+*   识别数字局限是只能识别规范字体
 *   比如本程序以一个包含0~9数字(Times New Roman字体，其他字体准确度可能会略有降低)的图片为模板，
 *   然后对提取资源图片中每个数字，进行模板匹配
-*   优点在于理论上可以识别任何规范的图形，例如车牌识别等
+*   优点在于理论上可以识别任何规范的图形
 */
 #include <iostream>
 #include <opencv2\opencv.hpp>
 using namespace std;
 using namespace cv;
+
 Mat frame, roi, temp;
+
 void numRecognizer();
 int main()
 {	
-	VideoCapture cap(0);	
-	temp = imread("num.jpg", 0);  // 模板，原图0~9		
+	VideoCapture cap(0);
+
+	temp = imread("num.jpg", 0);  // 模板，原图0~9	
+
 	while (cap.isOpened())	
 	{		
 		cap >> frame;		
-		roi = frame(Rect(20, 80, 600, 100)).clone();		
-		blur(frame, frame, Size(15, 15));		
-		roi.copyTo(frame(Rect(20, 80, 600, 100)));		
+		roi = frame(Rect(20, 80, 600, 100)).clone();//提取图像区域		
+		blur(frame, frame, Size(15, 15));//滤波
+		roi.copyTo(frame(Rect(20, 80, 600, 100))); //将图像区域复制到框架
 		rectangle(frame, Point(20, 80), Point(620, 180), Scalar(0, 200, 0), 2);		
 		imshow("数字识别", frame);		
 		int key = waitKey(20);		
 		if (frame.empty() || key == 27)			
-			break;		
+			break;//Esc退出
 		if (key == (int)'0')			
-			numRecognizer();	
+			numRecognizer();//0键识别	
 	} 	
 	return 0;
 } 
 void numRecognizer()
 {	
 	Mat src;	
-	cvtColor(roi, src, CV_BGR2GRAY);	
-	threshold(src, src, 100, 255, THRESH_BINARY_INV);	
-	Mat element = getStructuringElement(MORPH_RECT, Size(1, 1));	
-	morphologyEx(src, src, MORPH_OPEN, element); 	
+	cvtColor(roi, src, CV_BGR2GRAY);//灰度处理
+	threshold(src, src, 100, 255, THRESH_BINARY_INV);//二值化
+	Mat element = getStructuringElement(MORPH_RECT, Size(1, 1));//返回指定形状-矩形 和尺寸的结构元素-中心点位置
+	morphologyEx(src, src, MORPH_OPEN, element);//膨胀腐蚀组合	
 	imwrite("num.png", src); 	
-	int row_begin, row_end, col_begin, col_end;  // 需要去掉带有数字的图片上下左右的黑边/白边，这四个数用于表示去掉黑边，数字区域在src中的行列坐标		
+	int row_begin, row_end, col_begin, col_end;//去掉带有数字的图片上下左右的黑边/白边
+											   //这四个数用于表示去掉黑边，数字区域在src中的行列坐标		
 	for (int i = 0; i < src.rows - 1; i++)	
 	{		
 		Mat row = src.row(i);		
@@ -97,13 +101,13 @@ void numRecognizer()
 		}	
 	} 	
 
-	/******* 开始提取每一个数字，进行匹配识别 ********/ 	
-	Mat dst = src(Range(row_begin, row_end), Range(col_begin, col_end));  // 去掉黑边的图片	
-	resize(temp, temp, Size(cvRound(7.1 * dst.rows), dst.rows));  // 改变temp的尺寸，与dst等高 	
-	int col_count_begin = 0;  // 从左向右分析图片中的数字，这两个变量用于分析当前分析到图片的哪一列	
+	//开始提取每一个数字，进行匹配识别 	
+	Mat dst = src(Range(row_begin, row_end), Range(col_begin, col_end));//去掉黑边的图片	
+	resize(temp, temp, Size(cvRound(7.1 * dst.rows), dst.rows));//改变temp的尺寸，与dst等高 	
+	int col_count_begin = 0;//从左向右分析图片中的数字，这两个变量用于分析当前分析到图片的哪一列	
 	int col_count_end = 0;	
 	bool end = false; 	
-	while (!end)  // ★★★★ 开始循环 ★★★★	
+	while (!end)//开始循环
 	{		
 		for (int i = col_count_end + 1; i < dst.cols - 1; i++)		
 		{			
@@ -126,13 +130,13 @@ void numRecognizer()
 			end = true;		
 		}		
 		else		
-		{			
+		{
 			tempImage = dst(Range::all(), Range(col_count_begin, col_count_end));  // 取出一个数字		
 		} 		
 		//cout << "(" << tempImage.rows << ", " << tempImage.cols << ")\t"; 		
 		
 		Mat resultImage;		
-		matchTemplate(temp, tempImage, resultImage, 1);				
+		matchTemplate(temp, tempImage, resultImage, 1);//temp是匹配图,tempImage是原图,result是结果/返回值,method表示比较所用的方法		
 		double minValue, maxValue;		
 		Point minLocation;		
 		minMaxLoc(resultImage, &minValue, &maxValue, &minLocation); 		
